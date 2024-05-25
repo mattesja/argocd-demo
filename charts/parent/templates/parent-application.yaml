@@ -1,0 +1,45 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: app-1
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  destination:
+    namespace: default
+    server: https://kubernetes.default.svc
+  project: default
+  sources:
+    - path: charts/app
+      repoURL: https://github.com/mattesja/argocd-demo
+      targetRevision: main
+      helm:
+        releaseName: app-1
+        valueFiles:
+          - app-1.yaml
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: app-2
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  destination:
+    namespace: default
+    server: https://kubernetes.default.svc
+  project: default
+  sources:
+    - path: charts/app
+      repoURL: https://github.com/mattesja/argocd-demo
+      targetRevision: main
+      helm:
+        releaseName: app-2
+        valueFiles:
+          - app-2.yaml

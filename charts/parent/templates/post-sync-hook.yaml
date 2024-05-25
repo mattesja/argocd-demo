@@ -1,0 +1,69 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  generateName: sync-child-application-app-1
+  annotations:
+    argocd.argoproj.io/hook: PreSync
+    argocd.argoproj.io/hook-delete-policy: HookSucceeded
+    argocd.argoproj.io/sync-wave: "1"
+spec:
+  template:
+    spec:
+      containers:
+        - name: sync-child-application
+          image: curlimages/curl
+          command:
+            - "/bin/sh"
+            - "-c"
+            - |
+              ADMIN_PW=$(cat /etc/secret/password)
+              echo "retrieve token"
+              ARGOCD_TOKEN=$(curl -k -X POST -H "Content-Type: application/json" https://$ARGO_ARGOCD_SERVER_SERVICE_HOST/api/v1/session -d "{\"username\":\"admin\",\"password\":\"$ADMIN_PW\"}"|sed "s/.*token.*\"\(.*\)\".*/\1/")
+              echo "sync app"
+              curl -k -X POST -H "Content-Type: application/json"  https://$ARGO_ARGOCD_SERVER_SERVICE_HOST/api/v1/applications/app-1/sync -H "Authorization: Bearer $ARGOCD_TOKEN"
+          volumeMounts:
+            - name: secret-volume
+              mountPath: /etc/secret
+              readOnly: true
+      volumes:
+        - name: secret-volume
+          secret:
+            secretName: argocd-initial-admin-secret
+      restartPolicy: Never
+  backoffLimit: 2
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  generateName: sync-child-application-app-2
+  annotations:
+    argocd.argoproj.io/hook: PostSync
+    argocd.argoproj.io/hook-delete-policy: HookSucceeded
+    argocd.argoproj.io/sync-wave: "2"
+spec:
+  template:
+    spec:
+      containers:
+        - name: sync-child-application
+          image: curlimages/curl
+          command:
+            - "/bin/sh"
+            - "-c"
+            - |
+              set -x
+              ADMIN_PW=$(cat /etc/secret/password)
+              echo "retrieve token"
+              ARGOCD_TOKEN=$(curl -k -X POST -H "Content-Type: application/json" https://$ARGO_ARGOCD_SERVER_SERVICE_HOST/api/v1/session -d "{\"username\":\"admin\",\"password\":\"$ADMIN_PW\"}"|sed "s/.*token.*\"\(.*\)\".*/\1/")
+              echo "sync app"
+              curl -k -X POST -H "Content-Type: application/json"  https://$ARGO_ARGOCD_SERVER_SERVICE_HOST/api/v1/applications/app-2/sync -H "Authorization: Bearer $ARGOCD_TOKEN"
+              sleep 20
+          volumeMounts:
+            - name: secret-volume
+              mountPath: /etc/secret
+              readOnly: true
+      volumes:
+        - name: secret-volume
+          secret:
+            secretName: argocd-initial-admin-secret
+      restartPolicy: Never
+  backoffLimit: 2
