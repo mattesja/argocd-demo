@@ -37,7 +37,7 @@ kind: Job
 metadata:
   generateName: sync-child-application-app-2
   annotations:
-    argocd.argoproj.io/hook: PostSync
+    argocd.argoproj.io/hook: PreSync
     argocd.argoproj.io/hook-delete-policy: HookSucceeded
     argocd.argoproj.io/sync-wave: "2"
 spec:
