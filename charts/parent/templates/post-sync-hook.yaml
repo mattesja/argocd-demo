@@ -16,6 +16,7 @@ spec:
             - "/bin/sh"
             - "-c"
             - |
+              set -x
               ADMIN_PW=$(cat /etc/secret/password)
               echo "retrieve token"
               ARGOCD_TOKEN=$(curl -ss -X POST -H "Content-Type: application/json" http://argo-argocd-server.argocd.svc.cluster.local/api/v1/session -d "{\"username\":\"admin\",\"password\":\"$ADMIN_PW\"}"|sed "s/.*token.*\"\(.*\)\".*/\1/")
