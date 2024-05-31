@@ -19,9 +19,9 @@ spec:
               set -x
               ADMIN_PW=$(cat /etc/secret/password)
               echo "retrieve token"
-              ARGOCD_TOKEN=$(curl -ss -X POST -H "Content-Type: application/json" http://argo-argocd-server.argocd.svc.cluster.local/api/v1/session -d "{\"username\":\"admin\",\"password\":\"$ADMIN_PW\"}"|sed "s/.*token.*\"\(.*\)\".*/\1/")
+              ARGOCD_TOKEN=$(curl -ss -k -X POST -H "Content-Type: application/json" https://argo-argocd-server.argocd.svc.cluster.local/api/v1/session -d "{\"username\":\"admin\",\"password\":\"$ADMIN_PW\"}"|sed "s/.*token.*\"\(.*\)\".*/\1/")
 
-              syncstatus=$(curl -ss -H "Content-Type: application/json"  http://argo-argocd-server.argocd.svc.cluster.local/api/v1/applications/app-1  -H "Authorization: Bearer $ARGOCD_TOKEN"| sed -n 's/.*"sync":{"status":"\([^"]*\)".*/\1/p')
+              syncstatus=$(curl -ss -k -H "Content-Type: application/json"  https://argo-argocd-server.argocd.svc.cluster.local/api/v1/applications/app-1  -H "Authorization: Bearer $ARGOCD_TOKEN"| sed -n 's/.*"sync":{"status":"\([^"]*\)".*/\1/p')
               echo "syncstatus: $syncstatus"
               if [ "$syncstatus" == "Synced" ]; then
                 echo "Application is synced. Exiting..."
@@ -29,7 +29,7 @@ spec:
               fi
 
               echo "sync app"
-              curl -ss -X POST -H "Content-Type: application/json"  http://argo-argocd-server.argocd.svc.cluster.local/api/v1/applications/app-1/sync -H "Authorization: Bearer $ARGOCD_TOKEN"
+              curl -ss -k -X POST -H "Content-Type: application/json"  https://argo-argocd-server.argocd.svc.cluster.local/api/v1/applications/app-1/sync -H "Authorization: Bearer $ARGOCD_TOKEN"
 
               echo "wait for health"
               # Trigger sync and then waiting for health is not thread safe!
@@ -39,7 +39,7 @@ spec:
               while [ "$status" != "Healthy" ]; do
                 sleep 5
                 echo "waiting for app-1 to be healthy"
-                status=$(curl -ss  -H "Content-Type: application/json"  http://argo-argocd-server.argocd.svc.cluster.local/api/v1/applications/app-1  -H "Authorization: Bearer $ARGOCD_TOKEN" | sed -n 's/.*"health":{"status":"\([^"]*\)".*/\1/p')
+                status=$(curl -ss -k -H "Content-Type: application/json"  https://argo-argocd-server.argocd.svc.cluster.local/api/v1/applications/app-1  -H "Authorization: Bearer $ARGOCD_TOKEN" | sed -n 's/.*"health":{"status":"\([^"]*\)".*/\1/p')
               done
               echo "app-1 is healthy"
           volumeMounts:
@@ -73,9 +73,9 @@ spec:
             - |
               ADMIN_PW=$(cat /etc/secret/password)
               echo "retrieve token"
-              ARGOCD_TOKEN=$(curl -X POST -H "Content-Type: application/json" http://argo-argocd-server.argocd.svc.cluster.local/api/v1/session -d "{\"username\":\"admin\",\"password\":\"$ADMIN_PW\"}"|sed "s/.*token.*\"\(.*\)\".*/\1/")
+              ARGOCD_TOKEN=$(curl -ss -k -X POST -H "Content-Type: application/json" https://argo-argocd-server.argocd.svc.cluster.local/api/v1/session -d "{\"username\":\"admin\",\"password\":\"$ADMIN_PW\"}"|sed "s/.*token.*\"\(.*\)\".*/\1/")
               echo "sync app"
-              curl -X POST -H "Content-Type: application/json" http://argo-argocd-server.argocd.svc.cluster.local/api/v1/applications/app-2/sync -H "Authorization: Bearer $ARGOCD_TOKEN"
+              curl -ss -k -X POST -H "Content-Type: application/json" https://argo-argocd-server.argocd.svc.cluster.local/api/v1/applications/app-2/sync -H "Authorization: Bearer $ARGOCD_TOKEN"
           volumeMounts:
             - name: secret-volume
               mountPath: /etc/secret
