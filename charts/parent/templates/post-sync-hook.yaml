@@ -27,11 +27,13 @@ spec:
                 exit 0
               fi
 
-              echo "wait and sync app"
-              sleep 30
+              echo "sync app"
+              curl -ss -X POST -H "Content-Type: application/json"  http://argo-argocd-server.argocd.svc.cluster.local/api/v1/applications/app-1/sync -H "Authorization: Bearer $ARGOCD_TOKEN"
+
+              echo "wait for health"
               # Trigger sync and then waiting for health is not thread safe!
               # We might encounter a race condition where the app health is still healthy, because the app was not restarted yet.
-              curl -ss -X POST -H "Content-Type: application/json"  http://argo-argocd-server.argocd.svc.cluster.local/api/v1/applications/app-1/sync -H "Authorization: Bearer $ARGOCD_TOKEN"
+              sleep 30
               status=""
               while [ "$status" != "Healthy" ]; do
                 sleep 5
