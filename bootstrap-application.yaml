@@ -11,7 +11,7 @@ spec:
   source:
     path: charts/parent
     repoURL: https://github.com/mattesja/argocd-demo
-    targetRevision: main
+    targetRevision: nohook
   destination:
     namespace: argocd
     server: 'https://kubernetes.default.svc'

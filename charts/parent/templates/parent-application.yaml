@@ -15,7 +15,7 @@ spec:
   sources:
     - path: charts/app
       repoURL: https://github.com/mattesja/argocd-demo
-      targetRevision: main
+      targetRevision: nohook
       helm:
         releaseName: app-1
         valueFiles:
@@ -38,7 +38,7 @@ spec:
   sources:
     - path: charts/app
       repoURL: https://github.com/mattesja/argocd-demo
-      targetRevision: main
+      targetRevision: nohook
       helm:
         releaseName: app-2
         valueFiles:
