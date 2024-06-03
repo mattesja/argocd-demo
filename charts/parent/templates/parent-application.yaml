@@ -17,7 +17,7 @@ spec:
   sources:
     - path: charts/app
       repoURL: https://github.com/mattesja/argocd-demo
-      targetRevision: HEAD
+      targetRevision: 1.0
       helm:
         releaseName: app-1
         valueFiles:
@@ -42,7 +42,7 @@ spec:
   sources:
     - path: charts/app
       repoURL: https://github.com/mattesja/argocd-demo
-      targetRevision: HEAD
+      targetRevision: 1.0
       helm:
         releaseName: app-2
         valueFiles:
