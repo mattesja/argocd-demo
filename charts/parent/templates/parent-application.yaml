@@ -12,6 +12,8 @@ spec:
     namespace: default
     server: https://kubernetes.default.svc
   project: default
+  syncPolicy:
+    automated: { }
   sources:
     - path: charts/app
       repoURL: https://github.com/mattesja/argocd-demo
@@ -35,6 +37,8 @@ spec:
     namespace: default
     server: https://kubernetes.default.svc
   project: default
+  syncPolicy:
+    automated: { }
   sources:
     - path: charts/app
       repoURL: https://github.com/mattesja/argocd-demo
